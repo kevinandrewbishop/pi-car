@@ -1,0 +1,50 @@
+<!DOCTYPE HTML>
+<!--please note I borrowed heavily from here: http://niltoid.com/blog/raspberry-pi-arduino-tornado/-->
+<html>
+  <head>
+    <style>
+      body { margin: 0px; padding: 0px; }
+      canvas { border: 1px solid #9C9898; }
+    </style>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+  </head>
+  <body>
+    <h1>Welcome!</h1>
+    <p>Hold your phone sideways.</p>
+    <p>Tilt forward to go.</p>
+    <p>Tilt left and right to turn</p>
+  </body>
+  <script>
+    var socket = new WebSocket("ws://192.168.1.6:8080/ws");
+
+    socket.onopen = function(){
+      console.log("connected");
+    };
+
+    socket.onmessage = function (message) {
+      console.log("receiving: " + message.data);
+    };
+
+    socket.onclose = function(){
+      console.log("disconnected");
+    };
+
+    sendMessage = function(message) {
+      socket.send(message);
+    };
+
+
+    $(document).ready(function(){
+      window.addEventListener('deviceorientation', function(event) {
+        beta = Math.round(event.beta,1);
+        gamma = Math.round(event.gamma,1);
+      });
+
+      setInterval(function(){
+        sendMessage(beta + "," + gamma);
+      }, 100);
+    });
+
+
+  </script>
+</html>
